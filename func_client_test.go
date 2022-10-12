@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 /*
@@ -28,15 +29,14 @@
 package rmux
 
 import (
+	"bytes"
+	"net"
 	"testing"
 	"time"
-	"net"
-	"github.com/salesforce/rmux/connection"
-	"bytes"
 )
 
 func TestConnectTimeout(t *testing.T) {
-	timeouts := []time.Duration {
+	timeouts := []time.Duration{
 		10 * time.Millisecond,
 		20 * time.Millisecond,
 		30 * time.Millisecond,
@@ -49,7 +49,6 @@ func TestConnectTimeout(t *testing.T) {
 		return
 	}
 	defer rmux.Listener.Close()
-
 
 	for _, timeout := range timeouts {
 		rmux.EndpointConnectTimeout = timeout
@@ -69,9 +68,9 @@ func TestConnectTimeout(t *testing.T) {
 		}
 
 		diff := time.Now().Sub(start)
-		if diff < timeout || diff > timeout + (10 * time.Millisecond) {
+		if diff < timeout || diff > timeout+(10*time.Millisecond) {
 			t.Errorf("Should have timed out in the given interval between %s and %s, but instead timed out in %s",
-				timeout, timeout + 10 * time.Millisecond, diff)
+				timeout, timeout+10*time.Millisecond, diff)
 		}
 
 		// Clear the pool
