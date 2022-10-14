@@ -31,6 +31,7 @@ package rmux
 import (
 	"bytes"
 	"net"
+	"rmux/connection"
 	"testing"
 	"time"
 )
