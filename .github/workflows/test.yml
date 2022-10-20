@@ -1,0 +1,44 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - anexia
+  pull_request:
+    branches:
+      - anexia
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ 1.19 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "${{ matrix.go }}"
+      - name: Install goimports
+        run: go install golang.org/x/tools/cmd/goimports@latest
+      # Would require a reformat of this repo
+      #- name: Check Go formatting
+      #  run: |
+      #    if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+      #        gofmt -s -l .
+      #        exit 1
+      #    fi
+      #- name: Check Go imports
+      #  run: |
+      #    if [ "$(goimports -d . | wc -l)" -gt 0 ]; then
+      #    goimports -d .
+      #    exit 1
+      #    fi
+      #- name: Run Go vet
+      #  run: go vet ./...
+      - name: Run Go test
+        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
