@@ -35,6 +35,8 @@ for the configuration json is as follows:
     "poolSize": int,
     "tcpConnections": [string, string, ...],
     "unixConnections": [string, string, ...],
+    "authUser": string,
+    "authPassword": string,
 
     "localTimeout": int,
     "localReadTimeout": int,
