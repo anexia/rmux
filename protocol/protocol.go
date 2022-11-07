@@ -141,7 +141,7 @@ func IsSupportedFunction(command []byte, isMultiplexing, isMultipleArgument bool
 	if command[0] == 'd' {
 		//*del is only supported if we're not multiplexing, or there's only one argument
 		if command[2] == 'l' && isMultipleArgument {
-			return false
+			return !isMultiplexing
 		}
 		//supported if multiplexing is disabled: discard
 		if command[1] == 'i' {
