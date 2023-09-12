@@ -49,19 +49,21 @@ type Connection struct {
 	// The writer to the redis server
 	Writer *writer.FlexibleWriter
 
-	protocol       string
-	endpoint       string
-	authUser       string
-	authPassword   string
-	connectTimeout time.Duration
-	readTimeout    time.Duration
-	writeTimeout   time.Duration
+	protocol          string
+	endpoint          string
+	authUser          string
+	authPassword      string
+	connectTimeout    time.Duration
+	readTimeout       time.Duration
+	writeTimeout      time.Duration
+	reconnectInterval time.Duration
+	nextReconnect     time.Time
 }
 
 // Initializes a new connection, of the given protocol and endpoint, with the given connection timeout
 // ex: "unix", "/tmp/myAwesomeSocket", 50*time.Millisecond
 func NewConnection(Protocol, Endpoint string, ConnectTimeout, ReadTimeout, WriteTimeout time.Duration,
-	authUser string, authPassword string) *Connection {
+	reconnectInterval time.Duration, authUser string, authPassword string) *Connection {
 	c := &Connection{}
 	c.protocol = Protocol
 	c.endpoint = Endpoint
@@ -70,13 +72,14 @@ func NewConnection(Protocol, Endpoint string, ConnectTimeout, ReadTimeout, Write
 	c.connectTimeout = ConnectTimeout
 	c.readTimeout = ReadTimeout
 	c.writeTimeout = WriteTimeout
+	c.reconnectInterval = reconnectInterval
 	return c
 }
 
 func (c *Connection) Disconnect() {
 	if c.connection != nil {
 		c.connection.Close()
-		log.Info("Disconnected a connection")
+		log.Debug("Disconnected a connection")
 		graphite.Increment("disconnect")
 	}
 	c.connection = nil
@@ -86,7 +89,7 @@ func (c *Connection) Disconnect() {
 }
 
 func (c *Connection) ReconnectIfNecessary() (err error) {
-	if c.IsConnected() {
+	if c.IsConnected() && time.Now().Before(c.nextReconnect) {
 		return nil
 	}
 
@@ -108,6 +111,9 @@ func (c *Connection) ReconnectIfNecessary() (err error) {
 	if err = c.authenticate(); err != nil {
 		return err
 	}
+
+	c.nextReconnect = time.Now().Add(c.reconnectInterval)
+	log.Debug("Connected a connection")
 
 	return nil
 }

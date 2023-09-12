@@ -47,6 +47,7 @@ type PoolConfig struct {
 	RemoteTimeout           int64    `json:"remoteTimeout"`
 	RemoteReadTimeout       int64    `json:"remoteReadTimeout"`
 	RemoteWriteTimeout      int64    `json:"remoteWriteTimeout"`
+	RemoteReconnectInterval int64    `json:"remoteReconnectInterval"`
 	RemoteConnectTimeout    int64    `json:"remoteConnectTimeout"`
 	Failover                bool     `json:"failover"`
 }
