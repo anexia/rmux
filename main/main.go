@@ -60,6 +60,7 @@ var remoteTimeout = flag.Int64("remoteTimeout", 0, "Timeout to set for remote re
 var remoteReadTimeout = flag.Int64("remoteReadTimeout", 0, "Timeout to set for remote redises (read)")
 var remoteWriteTimeout = flag.Int64("remoteWriteTimeout", 0, "Timeout to set for remote redises (write)")
 var remoteConnectTimeout = flag.Int64("remoteConnectTimeout", 0, "Timeout to set for remote redises (connect)")
+var remoteReconnectInterval = flag.Int64("remoteReconnectInterval", 0, "Interval in which connected redis connections will be forced to reconnect in minutes")
 var cpuProfile = flag.String("cpuProfile", "", "Direct CPU Profile to target file")
 var configFile = flag.String("config", "", "Configuration file (JSON)")
 var doDebug = flag.Bool("debug", false, "Debug mode")
@@ -148,10 +149,11 @@ func configureFromArgs() ([]PoolConfig, error) {
 		LocalWriteTimeout:       *localWriteTimeout,
 		LocalTransactionTimeout: *localTransactionTimeout,
 
-		RemoteTimeout:        *remoteTimeout,
-		RemoteReadTimeout:    *remoteReadTimeout,
-		RemoteWriteTimeout:   *remoteWriteTimeout,
-		RemoteConnectTimeout: *remoteConnectTimeout,
+		RemoteTimeout:           *remoteTimeout,
+		RemoteReadTimeout:       *remoteReadTimeout,
+		RemoteWriteTimeout:      *remoteWriteTimeout,
+		RemoteConnectTimeout:    *remoteConnectTimeout,
+		RemoteReconnectInterval: *remoteReconnectInterval,
 	}}
 
 	return config, nil
@@ -255,6 +257,12 @@ func createInstances(configs []PoolConfig) (rmuxInstances []*rmux.RedisMultiplex
 			duration := time.Duration(config.RemoteWriteTimeout) * time.Millisecond
 			rmuxInstance.EndpointWriteTimeout = duration
 			log.Info("Setting remote redis write timeout to: %s", duration)
+		}
+
+		if config.RemoteReconnectInterval != 0 {
+			interval := time.Duration(config.RemoteReconnectInterval) * time.Minute
+			rmuxInstance.EndpointReconnectInterval = interval
+			log.Info("Setting remote reconnect interval to: %s", interval)
 		}
 
 		rmuxInstance.AuthUser = config.AuthUser
