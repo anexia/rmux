@@ -61,6 +61,7 @@ var remoteReadTimeout = flag.Int64("remoteReadTimeout", 0, "Timeout to set for r
 var remoteWriteTimeout = flag.Int64("remoteWriteTimeout", 0, "Timeout to set for remote redises (write)")
 var remoteConnectTimeout = flag.Int64("remoteConnectTimeout", 0, "Timeout to set for remote redises (connect)")
 var remoteReconnectInterval = flag.Int64("remoteReconnectInterval", 0, "Interval in which connected redis connections will be forced to reconnect in minutes")
+var remoteDiagnosticCheckInterval = flag.Int64("remoteDiagnosticCheckInterval", 0, "Interval to check the diagnostic connection in seconds")
 var cpuProfile = flag.String("cpuProfile", "", "Direct CPU Profile to target file")
 var configFile = flag.String("config", "", "Configuration file (JSON)")
 var doDebug = flag.Bool("debug", false, "Debug mode")
@@ -149,11 +150,12 @@ func configureFromArgs() ([]PoolConfig, error) {
 		LocalWriteTimeout:       *localWriteTimeout,
 		LocalTransactionTimeout: *localTransactionTimeout,
 
-		RemoteTimeout:           *remoteTimeout,
-		RemoteReadTimeout:       *remoteReadTimeout,
-		RemoteWriteTimeout:      *remoteWriteTimeout,
-		RemoteConnectTimeout:    *remoteConnectTimeout,
-		RemoteReconnectInterval: *remoteReconnectInterval,
+		RemoteTimeout:                 *remoteTimeout,
+		RemoteReadTimeout:             *remoteReadTimeout,
+		RemoteWriteTimeout:            *remoteWriteTimeout,
+		RemoteConnectTimeout:          *remoteConnectTimeout,
+		RemoteReconnectInterval:       *remoteReconnectInterval,
+		RemoteDiagnosticCheckInterval: *remoteDiagnosticCheckInterval,
 	}}
 
 	return config, nil
@@ -263,6 +265,12 @@ func createInstances(configs []PoolConfig) (rmuxInstances []*rmux.RedisMultiplex
 			interval := time.Duration(config.RemoteReconnectInterval) * time.Minute
 			rmuxInstance.EndpointReconnectInterval = interval
 			log.Info("Setting remote reconnect interval to: %s", interval)
+		}
+
+		if config.RemoteDiagnosticCheckInterval != 0 {
+			interval := time.Duration(config.RemoteDiagnosticCheckInterval) * time.Second
+			rmuxInstance.EndpointDiagnosticCheckInterval = interval
+			log.Info("Setting remote diagnostic check interval to: %s", interval)
 		}
 
 		rmuxInstance.AuthUser = config.AuthUser
