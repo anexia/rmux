@@ -31,24 +31,26 @@ import (
 )
 
 type PoolConfig struct {
-	Host                    string   `json:"host"`
-	Port                    int      `json:"port"`
-	Socket                  string   `json:"socket"`
-	MaxProcesses            int      `json:"maxProcesses"`
-	PoolSize                int      `json:"poolSize"`
-	TcpConnections          []string `json:"tcpConnections"`
-	UnixConnections         []string `json:"unixConnections"`
-	AuthUser                string   `json:"authUser"`
-	AuthPassword            string   `json:"authPassword"`
-	LocalTimeout            int64    `json:"localTimeout"`
-	LocalReadTimeout        int64    `json:"localReadTimeout"`
-	LocalWriteTimeout       int64    `json:"localWriteTimeout"`
-	LocalTransactionTimeout int64    `json:"localTransactionTimeout"`
-	RemoteTimeout           int64    `json:"remoteTimeout"`
-	RemoteReadTimeout       int64    `json:"remoteReadTimeout"`
-	RemoteWriteTimeout      int64    `json:"remoteWriteTimeout"`
-	RemoteConnectTimeout    int64    `json:"remoteConnectTimeout"`
-	Failover                bool     `json:"failover"`
+	Host                          string   `json:"host"`
+	Port                          int      `json:"port"`
+	Socket                        string   `json:"socket"`
+	MaxProcesses                  int      `json:"maxProcesses"`
+	PoolSize                      int      `json:"poolSize"`
+	TcpConnections                []string `json:"tcpConnections"`
+	UnixConnections               []string `json:"unixConnections"`
+	AuthUser                      string   `json:"authUser"`
+	AuthPassword                  string   `json:"authPassword"`
+	LocalTimeout                  int64    `json:"localTimeout"`
+	LocalReadTimeout              int64    `json:"localReadTimeout"`
+	LocalWriteTimeout             int64    `json:"localWriteTimeout"`
+	LocalTransactionTimeout       int64    `json:"localTransactionTimeout"`
+	RemoteTimeout                 int64    `json:"remoteTimeout"`
+	RemoteReadTimeout             int64    `json:"remoteReadTimeout"`
+	RemoteWriteTimeout            int64    `json:"remoteWriteTimeout"`
+	RemoteReconnectInterval       int64    `json:"remoteReconnectInterval"`
+	RemoteDiagnosticCheckInterval int64    `json:"remoteDiagnosticCheckInterval"`
+	RemoteConnectTimeout          int64    `json:"remoteConnectTimeout"`
+	Failover                      bool     `json:"failover"`
 }
 
 func ReadConfigFromFile(configFile string) ([]PoolConfig, error) {
