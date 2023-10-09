@@ -215,6 +215,7 @@ func (this *Client) FlushRedisAndRespond() (err error) {
 
 	if redisConn.DatabaseId != this.DatabaseId {
 		if err = redisConn.SelectDatabase(this.DatabaseId); err != nil {
+			log.Error("Select database failed: %s", err)
 			return
 		}
 	}
