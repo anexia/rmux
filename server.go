@@ -388,9 +388,9 @@ func (this *RedisMultiplexer) HandleError(client *Client, err error) {
 		client.Active = false
 		return
 	} else if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-		// We had a read timeout. Let the client know that the connection is down
+		// We had a read timeout. Disconnect the client to ensure a known state.
 		graphite.Increment("nettimeout")
-		client.FlushError(ERR_TIMEOUT)
+		client.Active = false
 		return
 	} else {
 		// This is something we've never seen before! Panic panic panic
