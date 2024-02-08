@@ -245,7 +245,6 @@ func (this *Client) FlushRedisAndRespond() (err error) {
 
 	if err = protocol.CopyServerResponses(redisConn.Reader, this.Writer, numCommands); err != nil {
 		log.Error("Error when copying redis responses to client: %s. Disconnecting the connection.", err)
-		this.ReadChannel <- readItem{nil, err}
 		return
 	}
 
